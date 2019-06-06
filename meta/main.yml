@@ -1,0 +1,25 @@
+---
+# meta file for mthconseil.haproxy
+
+dependencies: []
+
+galaxy_info:
+  author: Michaël Thieulin
+  description: |
+    The HaProxy role allows you to install and configure the last version
+    of HaProxy for heavy traffic websites. The role also tweak some kernel
+    settings.
+  company: MTH Conseil
+  license: MIT
+  issue_tracker_url: https://github.com/MTHConseil/ansible-role-haproxy/issues
+  min_ansible_version: 2.3
+  github_branch: master
+  platforms:
+  - name: Debian
+    versions:
+      - stretch
+  galaxy_tags:
+    - haproxy
+    - web
+    - networking
+    - cloud
