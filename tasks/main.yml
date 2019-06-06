@@ -1,6 +1,11 @@
 ---
 # tasks file for mthconseil.haproxy
 
+- name: Load ip_conntrack module
+  become: yes
+  modprobe: name=ip_conntrack state=present
+  tags: [haproxy, system]
+
 - name: Configure system variables for heavy traffic in {{ mthconseil_haproxy_sysctl_configuration_file }}
   become: yes
   sysctl: name={{ item.token }} value={{ item.value }} sysctl_file={{ mthconseil_haproxy_sysctl_configuration_file }}
@@ -18,9 +23,14 @@
   lineinfile: path=/etc/rc.local line="/sbin/sysctl -p{{ mthconseil_haproxy_sysctl_configuration_file }}" insertbefore='^exit 0'
   tags: [haproxy, system]
 
+- name: Enable the backports repository
+  become: yes
+  apt_repository: repo='deb {{ mthconseil_haproxy_backports_repository_url }} stretch-backports main' state=present filename='backports'
+  tags: [haproxy, install]
+
 - name: Install the latest stable release version of HaProxy
   become: yes
-  apt: name=haproxy state=present
+  apt: name=haproxy state=present default_release=stretch-backports
   tags: [haproxy, install]
 
 - name: Configure HaProxy via default configuration file

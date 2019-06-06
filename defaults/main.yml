@@ -23,6 +23,8 @@ mthconseil_haproxy_modules_options_filename: local.conf
 mthconseil_haproxy_modules_options:
   - { module: nf_conntrack, params: 'hashsize=1310720'} # Increase by a factor of 80 the size of the hash table storing the list of conntrack entries
 
+mthconseil_haproxy_backports_repository_url: http://deb.debian.org/debian
+
 mthconseil_haproxy:
   global: {}
   defaults: {}
