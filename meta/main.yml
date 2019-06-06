@@ -4,6 +4,7 @@
 dependencies: []
 
 galaxy_info:
+  role_name: haproxy
   author: Michaël Thieulin
   description: |
     The HaProxy role allows you to install and configure the last version
