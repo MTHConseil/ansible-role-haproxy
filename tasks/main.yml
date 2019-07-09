@@ -6,21 +6,33 @@
   modprobe: name=ip_conntrack state=present
   tags: [haproxy, system]
 
+- name: "Grab packages list in facts"
+  package_facts:
+
 - name: Configure system variables for heavy traffic in {{ mthconseil_haproxy_sysctl_configuration_file }}
   become: yes
   sysctl: name={{ item.token }} value={{ item.value }} sysctl_file={{ mthconseil_haproxy_sysctl_configuration_file }}
   with_items: '{{ mthconseil_haproxy_system_configuration + mthconseil_haproxy_system_configuration_extra }}'
+  when: "'ufw' not in ansible_facts.packages"
+  tags: [haproxy, system]
+
+- name: Configure system variables for heavy traffic in /etc/ufw/sysctl.conf if ufw is present
+  become: yes
+  lineinfile: path=/etc/ufw/sysctl.conf line="{{ item.token| replace('.','/') }}={{ item.value }}"
+  with_items: '{{ mthconseil_haproxy_system_configuration + mthconseil_haproxy_system_configuration_extra }}'
+  when: "'ufw' in ansible_facts.packages"
+  tags: [haproxy, system]
+
+- name: Restart ufw
+  become: yes
+  service: name=ufw state=restarted
+  when: "'ufw' in ansible_facts.packages"
   tags: [haproxy, system]
 
 - name: Configure system modules for heavy traffic
   become: yes
   lineinfile: path=/etc/modprobe.d/{{ mthconseil_haproxy_modules_options_filename }} line="options {{ item.module }} {{ item.params }}" create=yes
   with_items: '{{ mthconseil_haproxy_modules_options }}'
-  tags: [haproxy, system]
-
-- name: Call sysctl -p in /etc/rc.local because several system settings are no more set after reboot
-  become: yes
-  lineinfile: path=/etc/rc.local line="/sbin/sysctl -p{{ mthconseil_haproxy_sysctl_configuration_file }}" insertbefore='^exit 0'
   tags: [haproxy, system]
 
 - name: Enable the backports repository
